@@ -2,6 +2,9 @@
   "name": "realtime-chat-app",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "homepage": "https://github.com/HitenChawda46/realtime-chat-app#readme",
   "bugs": {
     "url": "https://github.com/HitenChawda46/realtime-chat-app/issues"

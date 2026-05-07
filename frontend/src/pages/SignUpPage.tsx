@@ -17,6 +17,7 @@ function SignUpPage() {
     email: "",
     password: "",
   });
+
   const { signup, isSigningUp } = useAuthStore();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {

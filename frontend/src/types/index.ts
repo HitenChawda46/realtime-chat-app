@@ -1,3 +1,7 @@
+export type ApiError = {
+  message: string;
+};
+
 export type SignUpData = {
   fullName: string;
   email: string;
@@ -9,6 +13,9 @@ export type LoginData = {
   password: string;
 };
 
-export type ApiError = {
-  message: string;
+export type User = {
+  _id: string;
+  fullName: string;
+  email: string;
+  profilePic: string;
 };

@@ -9,7 +9,7 @@ export const getAllContacts = async (req, res) => {
       _id: { $ne: loggedInUserId },
     }).select("-password");
 
-    res.status(200).json({ users: filteredUsers });
+    res.status(200).json({ contacts: filteredUsers });
   } catch (error) {
     console.log("Error in getAllContacts:", error);
     res.status(500).json({ message: "Internal Server Error" });

@@ -3,13 +3,14 @@ import toast from "react-hot-toast";
 import type { AxiosError } from "axios";
 
 import { axiosInstance } from "../lib/axios";
-import type { ApiError, LoginData, SignUpData } from "../types";
+import type { ApiError, LoginData, SignUpData, User } from "../types";
 
 type AuthStore = {
-  authUser: null | object;
+  authUser: null | User;
   isCheckingAuth: boolean;
   isSigningUp: boolean;
   isLoggingIn: boolean;
+
   checkAuth: () => Promise<void>;
   signup: (data: SignUpData) => Promise<void>;
   login: (data: LoginData) => Promise<void>;
@@ -24,7 +25,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   checkAuth: async () => {
     try {
-      const res = await axiosInstance.get("/auth/check");
+      const res = await axiosInstance.get<User>("/auth/check");
       set({ authUser: res.data });
     } catch (error) {
       console.log("Error in authCheck:", error);
@@ -37,7 +38,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   signup: async (data: SignUpData) => {
     set({ isSigningUp: true });
     try {
-      const res = await axiosInstance.post("/auth/signup", data);
+      const res = await axiosInstance.post<User>("/auth/signup", data);
       set({ authUser: res.data });
       toast.success("Account created successfully!");
     } catch (error) {
@@ -51,7 +52,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   login: async (data: LoginData) => {
     set({ isLoggingIn: true });
     try {
-      const res = await axiosInstance.post("/auth/login", data);
+      const res = await axiosInstance.post<User>("/auth/login", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
     } catch (error) {

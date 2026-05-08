@@ -2,7 +2,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import type { AxiosError } from "axios";
 
-import type { ApiError, User } from "../types";
+import type { ApiError, Message, User } from "../types";
 import { axiosInstance } from "../lib/axios";
 
 type ActiveTabType = "chats" | "contacts";
@@ -10,7 +10,7 @@ type ActiveTabType = "chats" | "contacts";
 type ChatStore = {
   allContacts: User[];
   chats: User[];
-  messages: [];
+  messages: Message[];
   activeTab: ActiveTabType;
   selectedUser: null | User;
   isUsersLoading: boolean;
@@ -19,9 +19,10 @@ type ChatStore = {
 
   toggleSound: () => void;
   setActiveTab: (tab: ActiveTabType) => void;
-  setSelectedUser: (selectedUser: User) => void;
+  setSelectedUser: (selectedUser: User | null) => void;
   getAllContacts: () => Promise<void>;
   getMyChatPartners: () => Promise<void>;
+  getMessagesByUserId: (userId: string) => Promise<void>;
 };
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -44,7 +45,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set({ activeTab: tab });
   },
 
-  setSelectedUser: (selectedUser: User) => {
+  setSelectedUser: (selectedUser: User | null) => {
     set({ selectedUser });
   },
 
@@ -77,6 +78,19 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       );
     } finally {
       set({ isUsersLoading: false });
+    }
+  },
+
+  getMessagesByUserId: async (userId: string) => {
+    set({ isMessagesLoading: true });
+    try {
+      const res = await axiosInstance.get(`/messages/${userId}`);
+      set({ messages: res.data });
+    } catch (error) {
+      const err = error as AxiosError<ApiError>;
+      toast.error(err.response?.data?.message || "Something went wrong");
+    } finally {
+      set({ isMessagesLoading: false });
     }
   },
 }));

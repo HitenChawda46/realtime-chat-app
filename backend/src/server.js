@@ -19,7 +19,7 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json()); // req.body
+app.use(express.json({ limit: "5mb" })); // req.body
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);

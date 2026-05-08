@@ -2,8 +2,9 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import type { AxiosError } from "axios";
 
-import type { ApiError, Message, User } from "../types";
+import type { ApiError, Message, MessageData, User } from "../types";
 import { axiosInstance } from "../lib/axios";
+import { useAuthStore } from "./useAuthStore";
 
 type ActiveTabType = "chats" | "contacts";
 
@@ -23,6 +24,7 @@ type ChatStore = {
   getAllContacts: () => Promise<void>;
   getMyChatPartners: () => Promise<void>;
   getMessagesByUserId: (userId: string) => Promise<void>;
+  sendMessage: (messageData: MessageData) => Promise<void>;
 };
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -91,6 +93,39 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       toast.error(err.response?.data?.message || "Something went wrong");
     } finally {
       set({ isMessagesLoading: false });
+    }
+  },
+
+  sendMessage: async (messageData: MessageData) => {
+    const { selectedUser, messages } = get();
+
+    const { authUser } = useAuthStore.getState();
+
+    const tempId = `temp-${Date.now()}`;
+
+    const optimisticMessage = {
+      _id: tempId,
+      senderId: authUser!._id,
+      receiverId: selectedUser!._id,
+      text: messageData.text,
+      image: messageData.image,
+      createdAt: new Date().toISOString(),
+      isOptimistic: true, // flag to identify optimistic messages (optional)
+    };
+    // immidetaly update the ui by adding the message
+    set({ messages: [...messages, optimisticMessage] });
+
+    try {
+      const res = await axiosInstance.post(
+        `/messages/send/${selectedUser!._id}`,
+        messageData,
+      );
+      set({ messages: messages.concat(res.data) });
+    } catch (error) {
+      // remove optimistic message on failure
+      set({ messages: messages });
+      const err = error as AxiosError<ApiError>;
+      toast.error(err.response?.data?.message || "Something went wrong");
     }
   },
 }));

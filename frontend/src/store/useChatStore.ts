@@ -8,8 +8,8 @@ import { axiosInstance } from "../lib/axios";
 type ActiveTabType = "chats" | "contacts";
 
 type ChatStore = {
-  allContacts: [];
-  chats: [];
+  allContacts: User[];
+  chats: User[];
   messages: [];
   activeTab: ActiveTabType;
   selectedUser: null | User;

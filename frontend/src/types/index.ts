@@ -13,6 +13,8 @@ export type LoginData = {
   password: string;
 };
 
+export type ProfileData = { profilePic: string | ArrayBuffer };
+
 export type User = {
   _id: string;
   fullName: string;
